@@ -1,7 +1,36 @@
-# Vue 3 + Vite
+## ding
+a tool always on the top
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+### how to use
 
-## Recommended IDE Setup
+#### dependency
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
+* rust
+* node
+* npm
+
+#### install
+
+```shell
+npm run tauri build
+```
+
+#### shortcut
+
+unmutable shortcut is 
+
+```text
+CommandOrControl+U
+```
+
+#### example
+
+![example1](./pics/example1.png)
+![example2](./pics/example2.png)
+
+
+### rely on and thands
+
+* [tauri](https://tauri.app/)
+
+* [md-editor-v3](https://imzbf.github.io/)

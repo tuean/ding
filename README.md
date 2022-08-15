@@ -1,5 +1,6 @@
 ## ding
-a tool always on the top
+
+a tool that always placed at the top to remind
 
 ### how to use
 
@@ -17,7 +18,7 @@ npm run tauri build
 
 #### shortcut
 
-unmutable shortcut is 
+unmutable shortcut is:
 
 ```text
 CommandOrControl+U
@@ -28,8 +29,7 @@ CommandOrControl+U
 ![example1](./pics/example1.png)
 ![example2](./pics/example2.png)
 
-
-### rely on and thands
+### rely on and thanks
 
 * [tauri](https://tauri.app/)
 

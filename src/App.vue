@@ -18,6 +18,11 @@ import { registerShortcut } from "./util/shortcut";
 import { reactive } from "vue";
 import { isRegistered, register, unregister } from "@tauri-apps/api/globalShortcut";
 import { useRouter } from "vue-router";
+import { appWindow, primaryMonitor } from "@tauri-apps/api/window";
+import {  } from '@tauri-apps/api/window';
+const monitor = primaryMonitor();
+
+console.log('monitor', monitor)
 
 console.log("register start");
 const state = reactive({
@@ -46,6 +51,13 @@ if (registed) {
   const un = unregiste(modelChange);
 }
 const result = registe(modelChange);
+
+console.log('window', appWindow)
+
+appWindow.listen("LogicalPosition", ({ event, payload }) => {
+  console.log('listen', event, payload)
+ });
+
 </script>
 
 <style scoped></style>

@@ -34,3 +34,17 @@ CommandOrControl+U
 * [tauri](https://tauri.app/)
 
 * [md-editor-v3](https://imzbf.github.io/)
+
+* [tauri-plugin-window-state](https://github.com/tauri-apps/tauri-plugin-window-state)
+
+### changelog
+
+#### v0.1.0
+
+first available version
+
+#### v0.1.1
+
+- support saving position and size by [tauri-plugin-window-state](https://github.com/tauri-apps/tauri-plugin-window-state)
+
+- fix set on top button

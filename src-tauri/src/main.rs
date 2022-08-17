@@ -104,8 +104,10 @@ fn main() {
       _ => {}
     })
     .invoke_handler(tauri::generate_handler![sync_html, sync_md])
+    .plugin(tauri_plugin_window_state::Builder::default().build())
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }
+
 
 

@@ -80,7 +80,9 @@
         "height": 200,
         "resizable": true,
         "title": "Ding",
-        "width": 800
+        "width": 800,
+        "decorations": false,
+        "transparent": true
       }
     ]
   }

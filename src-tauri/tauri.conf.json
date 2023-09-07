@@ -82,7 +82,16 @@
         "title": "Ding",
         "width": 800,
         "decorations": false,
-        "transparent": true
+        "transparent": true,
+        "label": "main"
+      },
+      {
+        "label": "clipboard",
+        "title": "剪贴板",
+        "url": "/#/clipboard",
+        "decorations": false,
+        "transparent": true,
+        "resizable": false
       }
     ]
   }

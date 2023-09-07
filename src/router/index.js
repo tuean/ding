@@ -13,22 +13,30 @@ const routes = [
     {
         name: "app",
         path: "/app",
-        // component: () => import('../App.vue'),
         component: App,
         children: [
             {
                 name: 'editor',
                 path: "editor",
                 component: () => import("../components/Editor.vue")
-                // component: Editor
               },
               {
                 name: 'view',
                 path: "view",
                 component: () => import("../components/View.vue")
-                // component: View
-              }
+              },
+              
         ]
+    },
+    {
+      name: 'viewTop',
+      path: "/viewTop",
+      component: () => import("../components/ViewTop.vue")
+    },
+    {
+      name: 'clipboard',
+      path: '/clipboard',
+      component: () => import("../components/clipboard/Base.vue")
     }
 ];
 

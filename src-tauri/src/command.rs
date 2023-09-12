@@ -2,7 +2,7 @@
 use crate::{content::{
     sync_content, sync_source
 }, clipboard::store::{get_record}};
-use serde::Serialize;
+// use serde::Serialize;
 
 
 #[tauri::command]

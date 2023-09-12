@@ -3,7 +3,7 @@ use rusqlite::{Connection, Result, Error};
 use std::time::{SystemTime, UNIX_EPOCH};
 use serde::Serialize;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub enum ClipType {
     Text,
     Image,

@@ -5,6 +5,8 @@ use tauri::{Manager, Position, LogicalPosition, LogicalSize, Size, App, GlobalSh
 pub type AppError = Box<(dyn std::error::Error + 'static)>;
 pub type SetupResult = Result<(), AppError>;
 
+static mut LAST_ID:i16 = 0;
+const NEW_CLIP: &'static str = "CLIPBOARD_UPDATE";
 
 /// 设置窗口
 fn set_window_main(app: &mut App) -> SetupResult {
@@ -27,6 +29,7 @@ fn set_window_clipboard(app: &mut App) -> SetupResult {
     // 设置窗口层级为顶级（高于菜单栏和Dock，Tauri默认设置会在Dock栏下面）
     // WindowUtil::set_window_top_level(&win);
     let _ = win.set_always_on_top(true);
+    let _ = win.hide();
     // 设置毛玻璃背景
     // #[cfg(target_os = "macos")]
     // window_vibrancy::apply_vibrancy(win, NSVisualEffectMaterial::Popover, None, None)
@@ -52,6 +55,10 @@ fn register_shortcut(app: &mut App) -> SetupResult {
             // app_handler.exit(0);
             let mut clipboard = Clipboard::new().unwrap();
             println!("Clipboard text was: {}", clipboard.get_text().unwrap());
+            // unsafe {
+            //     let clips = crate::clipboard::store::get_record(LAST_ID);
+            // }   
+            let _ = app_handler.emit_all(NEW_CLIP, ());
             let _ = window.show();
             window.set_focus().unwrap();
         }

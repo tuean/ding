@@ -3,15 +3,16 @@
 // use https://crates.io/crates/arboard to get content/file in clipboard
 // todo: file type not support yet
 
-mod store;
+pub(crate) mod store;
 use clipboard_master::{Master, ClipboardHandler, CallbackResult};
 use arboard::Clipboard;
 
 use std::io;
 
-use crate::clipboard::store::init_table;
+use crate::clipboard::store::{init_table, add_record};
 
 struct Handler;
+
 
 impl ClipboardHandler for Handler {
     fn on_clipboard_change(&mut self) -> CallbackResult {
@@ -28,7 +29,14 @@ impl ClipboardHandler for Handler {
 
 fn listen() {
     let mut clipboard = Clipboard::new().unwrap();
-    println!("Clipboard text was: {}", clipboard.get_text().unwrap());
+    match clipboard.get_text() {
+        Ok(text) => {
+            println!("Clipboard text was: {}", text);
+            let _ = add_record(&text, store::ClipType::Text);
+        },
+        Err(_) => {},
+    }
+    
 }
 
 pub fn clipboard_listen() {

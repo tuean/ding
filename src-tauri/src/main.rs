@@ -5,6 +5,7 @@ mod setup;
 mod menu;
 mod command;
 mod clipboard;
+mod logger;
 
 // #![cfg_attr(
 //   all(not(debug_assertions), target_os = "windows"),
@@ -13,6 +14,7 @@ mod clipboard;
 
 
 fn main() {
+  logger::init();
 
   let (menu, tray) = menu::generate_menu();
   let context = tauri::generate_context!();
@@ -25,7 +27,7 @@ fn main() {
     .menu(menu)
     .system_tray(tray)
     .on_system_tray_event(menu::generate_tray)
-    .invoke_handler(tauri::generate_handler![command::sync_html, command::sync_md])
+    .invoke_handler(tauri::generate_handler![command::sync_html, command::sync_md, command::get_clipboard])
     .plugin(tauri_plugin_window_state::Builder::default().build())
     .setup(setup::init)
     .run(context)

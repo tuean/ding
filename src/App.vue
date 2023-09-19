@@ -15,7 +15,14 @@ import { registerShortcut } from "./util/shortcut";
 import { reactive } from "vue";
 import { isRegistered, register, unregister } from "@tauri-apps/api/globalShortcut";
 import { useRouter } from "vue-router";
-import { appWindow, primaryMonitor } from "@tauri-apps/api/window";
+import { appWindow, primaryMonitor, WebviewWindow } from "@tauri-apps/api/window";
+import { emit, listen } from '@tauri-apps/api/event'
+
+const webview = new WebviewWindow('clipboard');
+listen('CLIPBOARD_UPDATE', (event) => {
+  console.log('clipboard update: ' + event)
+})
+
 const monitor = primaryMonitor();
 
 console.log('monitor', monitor)

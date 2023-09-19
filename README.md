@@ -38,11 +38,19 @@ CommandOrControl+U
 * [tauri-plugin-window-state](https://github.com/tauri-apps/tauri-plugin-window-state)
 
 ### fix on windows
+
 1. download [msys2](https://www.msys2.org/)
 
 2. set gcc path
+
 ```powershell
  $env:path+=";C:\msys64\ucrt64\bin"
+```
+
+### show trace on windows
+
+```powershell
+ $env:RUST_BACKTRACE=1
 ```
 
 ### changelog
@@ -53,6 +61,6 @@ first available version
 
 #### v0.1.1
 
-- support saving position and size by [tauri-plugin-window-state](https://github.com/tauri-apps/tauri-plugin-window-state)
+* support saving position and size by [tauri-plugin-window-state](https://github.com/tauri-apps/tauri-plugin-window-state)
 
-- fix set on top button
+* fix set on top button

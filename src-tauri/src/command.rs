@@ -1,7 +1,7 @@
 
 use crate::{content::{
     sync_content, sync_source
-}, clipboard::store::{get_record}};
+}, clipboard::store::{get_record, Clip}};
 // use serde::Serialize;
 
 
@@ -18,9 +18,18 @@ pub fn sync_md(content: String) {
 }
 
 #[tauri::command]
-pub fn get_clipboard(last_id: i16) -> Option<String>{
+pub fn get_clipboard(last_id: i16) -> Vec<Clip> {
   println!("invoked from JS! {}", last_id);
-  let clips = get_record(last_id).unwrap();
-  let result = serde_json::to_string(&clips).unwrap();
-  Some(result)
+  let mut clips = get_record(last_id);
+  let mut empty: Vec<Clip> = Vec::new();
+  clips = match clips {
+    Ok(v) => return v,
+    Err(err) => {
+      println!("select error:{}", err);
+      return empty;
+    }
+  };
+  // let result: String = serde_json::to_string(&clips).unwrap();
+  // Some(result)
+  // clips.unwrap()
 }

@@ -1,7 +1,7 @@
-use rusqlite::{Connection, Result, Error};
-// use rusqlite::NO_PARAMS;
+use rusqlite::{Connection, Result, Error, params};
 use std::time::{SystemTime, UNIX_EPOCH};
 use serde::Serialize;
+use tauri::api::path::data_dir;
 
 #[derive(Debug, Serialize)]
 pub enum ClipType {
@@ -41,10 +41,17 @@ pub struct Clip {
     date: i32
 }
 
+fn get_connection() -> Connection {
+    let mut data_path: std::path::PathBuf = data_dir().unwrap();
+    data_path.push("clipboard.db");
+    let mut path = data_path.as_path().display().to_string();
+    let conn: Connection = Connection::open(path).unwrap();
+    conn
+}
+
 pub fn init_table() -> Result<(), Error> {
     println!("init table");
-    let conn: Connection = Connection::open("clipboard.db")?;
-    // let conn = Connection::open_in_memory()?;
+    let conn: Connection = get_connection();
     match conn.execute(
             "create table if not exists tb_clipboard (
                 id INTEGER PRIMARY KEY,
@@ -60,7 +67,7 @@ pub fn init_table() -> Result<(), Error> {
 }
 
 pub fn add_record(content:&String, clip_type:ClipType) -> Result<(), Error> {
-    let conn: Connection = Connection::open("clipboard.db")?;
+    let conn: Connection = get_connection();
     let now = match SystemTime::now().duration_since(UNIX_EPOCH) {
         Ok(n) => n.as_secs(),
         Err(_) => 1,
@@ -77,14 +84,12 @@ pub fn add_record(content:&String, clip_type:ClipType) -> Result<(), Error> {
 }
 
 pub fn get_record(last_id: i16) -> Result<Vec<Clip>, Error> {
-    let conn: Connection = Connection::open("clipboard.db")?;
-    let sql = "select id, content_type, content, date from tb_clipboard";
-    let sql_with_param = "select id, content_type, content, date from tb_clipboard where id > :id";
-    let mut stmt = conn.prepare(sql)?;
-    if last_id > 1 {
-        stmt = conn.prepare(sql_with_param)?;
-    }
-    let clips = stmt.query_map(&[(":id", &last_id)], |row| {
+    let conn: Connection = get_connection();
+    let sql_with_param = "select id, content_type, content, date from tb_clipboard where id > ? limit 10";
+    let mut stmt = conn.prepare(sql_with_param)?;
+    
+    println!("sql_with_param: {} id: {}", sql_with_param, last_id);
+    let clips = stmt.query_map(params![&last_id], |row| {
         Ok(Clip {
              id: row.get(0)?, 
              content_type: ClipType::parse_name(row.get(1)?), 

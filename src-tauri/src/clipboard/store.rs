@@ -44,7 +44,7 @@ pub struct Clip {
 fn get_connection() -> Connection {
     let mut data_path: std::path::PathBuf = data_dir().unwrap();
     data_path.push("clipboard.db");
-    let mut path = data_path.as_path().display().to_string();
+    let path = data_path.as_path().display().to_string();
     let conn: Connection = Connection::open(path).unwrap();
     conn
 }

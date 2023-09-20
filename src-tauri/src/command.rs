@@ -21,7 +21,7 @@ pub fn sync_md(content: String) {
 pub fn get_clipboard(last_id: i16) -> Vec<Clip> {
   println!("invoked from JS! {}", last_id);
   let mut clips = get_record(last_id);
-  let mut empty: Vec<Clip> = Vec::new();
+  let empty: Vec<Clip> = Vec::new();
   clips = match clips {
     Ok(v) => return v,
     Err(err) => {

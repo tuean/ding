@@ -5,7 +5,7 @@ use tauri::{Manager, Position, LogicalPosition, LogicalSize, Size, App, GlobalSh
 pub type AppError = Box<(dyn std::error::Error + 'static)>;
 pub type SetupResult = Result<(), AppError>;
 
-static mut LAST_ID:i16 = 0;
+// static mut LAST_ID:i16 = 0;
 const NEW_CLIP: &'static str = "CLIPBOARD_UPDATE";
 
 /// 设置窗口
@@ -46,15 +46,15 @@ fn register_shortcut(app: &mut App) -> SetupResult {
     let app_handler = app.handle();
     short_cut.register("ctrl+alt+v", move || {
         let window = app_handler.get_window("clipboard").unwrap();
-        println!("ctrl + alt + v");
+        println!("swtich action detected");
         if window.is_visible().unwrap() {
             // 使用 app.hide() 而不是 window.hide()，才能实现隐藏时焦点恢复到上一个应用
             // app_handler.exit(0);
             let _ = window.hide();
         } else {
             // app_handler.exit(0);
-            let mut clipboard = Clipboard::new().unwrap();
-            println!("Clipboard text was: {}", clipboard.get_text().unwrap());
+            // let mut clipboard = Clipboard::new().unwrap();
+            // println!("Clipboard text was: {}", clipboard.get_text().unwrap());
             // unsafe {
             //     let clips = crate::clipboard::store::get_record(LAST_ID);
             // }   

@@ -73,7 +73,7 @@ appWindow.listen("LogicalPosition", ({ event, payload }) => {
 
 <style scoped>
 .drag {
-  height:24px;
+  height:10vh;
   width: 100%;
   /* background-color: aqua; */
   top: 0;

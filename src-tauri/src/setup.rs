@@ -18,7 +18,7 @@ fn set_window_main(app: &mut App) -> SetupResult {
 
 fn set_window_clipboard(app: &mut App) -> SetupResult {
     let win = app.get_window("clipboard").unwrap();
-    const HEIGHT: f64 = 350.0;
+    const HEIGHT: f64 = 250.0;
     // 设置大小和位置
     let monitor = win.current_monitor()
         .expect("failed to get monitor info")

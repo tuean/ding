@@ -18,9 +18,17 @@ export const union_list = (data, list) => {
     return sort_list(list);
 }
 
+export const set_checked = list => {
+    if (list === null || list === undefined || list.length < 1) return
+    list.forEach(element => {
+        element.checked = false
+    });
+    list[0].checked = true
+}
+
 export const sort_list = (list) => {
     list.sort((a, b) => {
         a.data - b.data
     })
-    return sort_list
+    return list
 }

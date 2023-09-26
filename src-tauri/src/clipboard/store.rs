@@ -43,7 +43,7 @@ pub struct Clip {
 
 fn get_connection() -> Connection {
     let mut data_path: std::path::PathBuf = data_dir().unwrap();
-    data_path.push("clipboard.db");
+    data_path.push("clipboard");
     let path = data_path.as_path().display().to_string();
     let conn: Connection = Connection::open(path).unwrap();
     conn
@@ -85,7 +85,7 @@ pub fn add_record(content:&String, clip_type:ClipType) -> Result<(), Error> {
 
 pub fn get_record(last_id: i16) -> Result<Vec<Clip>, Error> {
     let conn: Connection = get_connection();
-    let sql_with_param = "select id, content_type, content, date from tb_clipboard where id > ? limit 10";
+    let sql_with_param = "select id, content_type, content, date from tb_clipboard where id > ? order by id desc limit 10";
     let mut stmt = conn.prepare(sql_with_param)?;
     
     println!("sql_with_param: {} id: {}", sql_with_param, last_id);

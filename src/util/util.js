@@ -27,8 +27,8 @@ export const set_checked = list => {
 }
 
 export const sort_list = (list) => {
-    list.sort((a, b) => {
-        a.data - b.data
+    [...list].sort((a, b) => {
+        b.id - a.id > 0 
     })
     return list
 }

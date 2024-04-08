@@ -9,7 +9,7 @@ use arboard::Clipboard;
 
 use std::io;
 
-use crate::clipboard::store::{init_table, add_record};
+use crate::{clipboard::store::{init_table, add_record}, setup::broadcast_new_clipboard_event};
 
 struct Handler;
 
@@ -37,7 +37,9 @@ fn listen() {
         Err(_) => {},
     }
     
+    broadcast_new_clipboard_event();
 }
+
 
 pub fn clipboard_listen() {
     let _ = init_table();

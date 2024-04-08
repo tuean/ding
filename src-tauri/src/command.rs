@@ -1,7 +1,9 @@
 
+use tauri::{AppHandle, GlobalWindowEvent, Manager, App, Error};
+
 use crate::{content::{
     sync_content, sync_source
-}, clipboard::store::{get_record, Clip}};
+}, clipboard::store::{get_record, Clip}, setup::{NEW_CLIP}};
 // use serde::Serialize;
 
 
@@ -33,3 +35,4 @@ pub fn get_clipboard(last_id: i16) -> Vec<Clip> {
   // Some(result)
   // clips.unwrap()
 }
+

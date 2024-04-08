@@ -1,12 +1,16 @@
 
+use std::thread;
+
 use arboard::Clipboard;
 use tauri::{Manager, Position, LogicalPosition, LogicalSize, Size, App, GlobalShortcutManager};
+
+use crate::clipboard;
 
 pub type AppError = Box<(dyn std::error::Error + 'static)>;
 pub type SetupResult = Result<(), AppError>;
 
 // static mut LAST_ID:i16 = 0;
-const NEW_CLIP: &'static str = "CLIPBOARD_UPDATE";
+pub const NEW_CLIP: &'static str = "CLIPBOARD_UPDATE";
 
 /// 设置窗口
 fn set_window_main(app: &mut App) -> SetupResult {
@@ -58,7 +62,8 @@ fn register_shortcut(app: &mut App) -> SetupResult {
             // unsafe {
             //     let clips = crate::clipboard::store::get_record(LAST_ID);
             // }   
-            let _ = app_handler.emit_all(NEW_CLIP, ());
+            // let _ = app_handler.emit_all(NEW_CLIP, ());
+            broadcast_new_clipboard_event();
             let _ = window.show();
             window.set_focus().unwrap();
         }
@@ -66,9 +71,30 @@ fn register_shortcut(app: &mut App) -> SetupResult {
     Ok(())
 }
 
+// 设置广播事件
+
+// static mut APP: Option<&mut App> = None;  
+
+pub fn init_app_handle(app:&mut App) -> Result<(), SetupResult> {
+  thread::spawn(|| {
+    clipboard::clipboard_listen();
+  });  
+  Ok(())
+}
+
+pub fn broadcast_new_clipboard_event() -> Result<(), SetupResult> {
+  unsafe {
+    let app_handle = APP.unwrap().app_handle();
+    let _ = app_handle.emit_all(NEW_CLIP, ());
+    println!("broadcast a new clipboard");
+    Ok(())
+  }
+}
+
 pub fn init(app: &mut App) -> SetupResult {
     set_window_main(app)?;
     set_window_clipboard(app)?;
     register_shortcut(app)?;
+    init_app_handle(app);
     Ok(())
 }

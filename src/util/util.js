@@ -15,7 +15,8 @@ export const union_list = (data, list) => {
         if (exist != null) continue
         list.push(item)
     } 
-    return sort_list(list);
+    // return sort_list(list);
+    return quickSort(list);
 }
 
 export const set_checked = list => {
@@ -27,8 +28,28 @@ export const set_checked = list => {
 }
 
 export const sort_list = (list) => {
-    [...list].sort((a, b) => {
+    list.sort((a, b) => {
         b.id - a.id > 0 
     })
-    return list
 }
+
+
+export const quickSort = arr => {
+    if (arr.length <= 1) {
+      return arr;
+    }
+    
+    const pivot = arr[arr.length - 1];
+    const leftArr = [];
+    const rightArr = [];
+    
+    for (let i = 0; i < arr.length - 1; i++) {
+      if (arr[i].id > pivot.id) {
+        leftArr.push(arr[i]);
+      } else {
+        rightArr.push(arr[i]);
+      }
+    }
+    
+    return [...quickSort(leftArr), pivot, ...quickSort(rightArr)];
+  }

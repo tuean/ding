@@ -19,9 +19,9 @@ fn main() {
   let (menu, tray) = menu::generate_menu();
   let context = tauri::generate_context!();
 
-  thread::spawn(|| {
-    clipboard::clipboard_listen();
-  });   
+  // thread::spawn(|| {
+  //   clipboard::clipboard_listen();
+  // });   
 
   tauri::Builder::default()
     .menu(menu)
@@ -30,6 +30,7 @@ fn main() {
     .invoke_handler(tauri::generate_handler![command::sync_html, command::sync_md, command::get_clipboard])
     .plugin(tauri_plugin_window_state::Builder::default().build())
     .setup(setup::init)
+    // .manage(state)
     .run(context)
     .expect("error while running tauri application");
 

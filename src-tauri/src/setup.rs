@@ -2,7 +2,7 @@
 use std::thread;
 
 use arboard::Clipboard;
-use tauri::{Manager, Position, LogicalPosition, LogicalSize, Size, App, GlobalShortcutManager};
+use tauri::{App, AppHandle, GlobalShortcutManager, LogicalPosition, LogicalSize, Manager, Position, Size};
 
 use crate::clipboard;
 
@@ -15,6 +15,7 @@ pub const NEW_CLIP: &'static str = "CLIPBOARD_UPDATE";
 /// 设置窗口
 fn set_window_main(app: &mut App) -> SetupResult {
     let win = app.get_window("main").unwrap();
+    // let win = app.get_window("clipboard").unwrap();
     let _ = win.center();
     let _ = win.hide();
     Ok(())
@@ -63,7 +64,8 @@ fn register_shortcut(app: &mut App) -> SetupResult {
             //     let clips = crate::clipboard::store::get_record(LAST_ID);
             // }   
             // let _ = app_handler.emit_all(NEW_CLIP, ());
-            broadcast_new_clipboard_event();
+
+            let _ = broadcast_new_clipboard_event(&app_handler);
             let _ = window.show();
             window.set_focus().unwrap();
         }
@@ -76,25 +78,28 @@ fn register_shortcut(app: &mut App) -> SetupResult {
 // static mut APP: Option<&mut App> = None;  
 
 pub fn init_app_handle(app:&mut App) -> Result<(), SetupResult> {
+  let apphandle = app.app_handle();
   thread::spawn(|| {
-    clipboard::clipboard_listen();
+    clipboard::clipboard_listen(apphandle);
   });  
   Ok(())
 }
 
-pub fn broadcast_new_clipboard_event() -> Result<(), SetupResult> {
-  unsafe {
-    let app_handle = APP.unwrap().app_handle();
-    let _ = app_handle.emit_all(NEW_CLIP, ());
-    println!("broadcast a new clipboard");
+pub fn broadcast_new_clipboard_event(app_handle: &AppHandle) -> Result<(), SetupResult> {
+    // let app_handle = app.app_handle();
+    let r = app_handle.emit_all("CLIPBOARD_UPDATE", ());
+    match r {
+        Ok(_) => println!("event send ok"),
+        Err(_) => println!("event send error"),
+    }
+    println!("broadcast a new event");
     Ok(())
-  }
 }
 
 pub fn init(app: &mut App) -> SetupResult {
     set_window_main(app)?;
     set_window_clipboard(app)?;
     register_shortcut(app)?;
-    init_app_handle(app);
+    let _ = init_app_handle(app);
     Ok(())
 }

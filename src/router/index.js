@@ -8,7 +8,7 @@ import App from '../App.vue'
 const routes = [
     {
         path: "/",
-        redirect: "/app/editor"
+        redirect: "/clipboard"
     },
     {
         name: "app",

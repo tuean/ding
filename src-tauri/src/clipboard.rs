@@ -6,18 +6,22 @@
 pub(crate) mod store;
 use clipboard_master::{Master, ClipboardHandler, CallbackResult};
 use arboard::Clipboard;
-
+use tauri::{App, AppHandle};
 use std::io;
 
-use crate::{clipboard::store::{init_table, add_record}, setup::broadcast_new_clipboard_event};
+// use crate::{clipboard::store::{init_table, add_record}, setup::broadcast_new_clipboard_event};
+use crate::{clipboard::store::{add_record, init_table}, setup::broadcast_new_clipboard_event};
 
-struct Handler;
+struct Handler {
+    pub apphandle: AppHandle
+}
 
 
 impl ClipboardHandler for Handler {
     fn on_clipboard_change(&mut self) -> CallbackResult {
         println!("Clipboard change happened!");
         listen();
+        let _ = broadcast_new_clipboard_event(&self.apphandle);
         CallbackResult::Next
     }
 
@@ -36,13 +40,10 @@ fn listen() {
         },
         Err(_) => {},
     }
-    
-    broadcast_new_clipboard_event();
 }
 
-
-pub fn clipboard_listen() {
+pub fn clipboard_listen(app: AppHandle) {
     let _ = init_table();
     println!("start to listen clipboard");
-    let _ = Master::new(Handler).run();
+    let _ = Master::new(Handler{apphandle: app}).run();
 }

@@ -72,14 +72,33 @@ pub fn add_record(content:&String, clip_type:ClipType) -> Result<(), Error> {
         Ok(n) => n.as_secs(),
         Err(_) => 1,
     };
-    match conn.execute(
-        "insert into tb_clipboard (content_type, content, date) values (
-            ?1, ?2, ?3
-        )", (ClipType::get_name(clip_type), content, now)
-    ) {
-        Ok(_) => { println!("add record success")},
-        Err(e) => { println!("add record error: {}", e) },
-    }
+
+    let c_type: String = ClipType::get_name(clip_type);
+    let c_type2 = c_type.clone();
+
+    // 首先尝试将已有的结果往前推
+    let update_exist = conn.execute("update tb_clipboard set date = ?1 where content_type = ?2 and content = ?3", 
+    (now, c_type, content));
+
+    match update_exist {
+        Ok(size) => {
+            println!("update exist {:?} date: {:?}", size, now);
+            if size == 0 {
+                match conn.execute(
+                    "insert into tb_clipboard (content_type, content, date) values (
+                        ?1, ?2, ?3
+                    )", (c_type2, content, now)
+                ) {
+                    Ok(_) => { println!("add record success")},
+                    Err(e) => { println!("add record error: {}", e) },
+                }
+            }
+
+        },
+        Err(e) => { println!("update exist error: {}", e)}
+    } 
+    
+    
     Ok(())
 }
 

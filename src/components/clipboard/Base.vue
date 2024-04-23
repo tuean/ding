@@ -2,7 +2,7 @@
     <div class="main">
         <!-- <div>剪贴板</div> -->
         <div class="content-box" ref="container">
-            <Box v-for="(info, index) in state.list" :info="info" :index="index"/>
+            <Box v-for="(info, index) in state.list" :info="info" :index="index" />
         </div>
 
     </div>
@@ -18,6 +18,7 @@ import Box from './Box.vue'
 
 const state = reactive({
     last_id: 0,
+    current_index: 0,
     list: []
 })
 
@@ -27,6 +28,25 @@ const clips = async (last_id) => {
     return data;
 }
 
+const move = (index) => {
+    state.current_index = index;
+    state.list.forEach(function (i) {
+        i.checked = i == index;
+    })
+}
+
+const next = () => {
+    let max = state.list.length
+    if (state.current_index >= max) return;
+    move(state.current_index + 1)
+    // console.log(state.list)
+}
+
+const last = () => {
+    if (state.current_index == 0) return;
+    move(state.current_index - 1)
+    // console.log(state.list)
+}
 
 
 // 滚轮事件监听
@@ -49,12 +69,38 @@ onMounted(() => {
     // 添加滚动事件监听器  
     container.value.addEventListener('wheel', handleWheel, { passive: false });
 
+    // 键盘事件处理  
+    document.addEventListener('keydown', function (event) {
+        console.log('key event', event)
+        switch (event.key) {
+            case 'ArrowUp':
+                last()
+                break;
+            case 'ArrowDown':
+                next()
+                break;
+            case 'ArrowLeft':
+                last();
+                break;
+            case 'ArrowRight':
+                next();
+                break;
+            default:
+                return;
+        }
 
+        // 将焦点设置到当前选中的项目，以便可以通过Tab键切换  
+        // items[currentIndex].focus();  
+
+        // 阻止默认行为和冒泡  
+        event.preventDefault();
+        event.stopPropagation();
+    });
 });
 
 const init = () => {
-        // 剪贴板事件监听
-        const webview = new WebviewWindow('clipboard');
+    // 剪贴板事件监听
+    const webview = new WebviewWindow('clipboard');
     debugger
     listen("CLIPBOARD_UPDATE", async (event) => {
         console.log('clipboard update: ', event)
@@ -64,7 +110,7 @@ const init = () => {
         console.log('old_list: ', old_list)
         let new_list = union_list(data, old_list)
         set_checked(new_list); // 给数据添加checked参数
-        state.list = new_list 
+        state.list = new_list
         console.log('list: ', new_list);
     })
 }

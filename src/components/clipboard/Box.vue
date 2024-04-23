@@ -35,6 +35,8 @@ console.log("info:", info)
 
 .box:checked {
     outline: 1px solid red;
+    background-color: #f2f2f2; /* 选中状态的背景色 */  
+    border-color: #007bff; /* 选中状态的边框色 */  
 }
 
 .content {

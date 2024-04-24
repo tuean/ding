@@ -2,7 +2,7 @@
     <div class="main">
         <!-- <div>剪贴板</div> -->
         <div class="content-box" ref="container">
-            <Box v-for="(info, index) in state.list" :info="info" :index="index" />
+            <Box v-for="(info, index) in state.list" :key="info.id" :info="info" :index="index" />
         </div>
 
     </div>
@@ -28,24 +28,26 @@ const clips = async (last_id) => {
     return data;
 }
 
-const move = (index) => {
-    state.current_index = index;
-    state.list.forEach(function (i) {
-        i.checked = i == index;
-    })
-}
+// const move = (index) => {
+//     state.current_index = index;
+//     state.list.forEach(function (i) {
+//         i.checked = i == index;
+//     })
+// }
 
 const next = () => {
     let max = state.list.length
-    if (state.current_index >= max) return;
-    move(state.current_index + 1)
-    // console.log(state.list)
+    if (state.current_index > max - 1) return;
+    state.current_index++
+    set_checked(state.list, state.current_index)
+    console.log('statelist:', state.list.value)
 }
 
 const last = () => {
     if (state.current_index == 0) return;
-    move(state.current_index - 1)
-    // console.log(state.list)
+    state.current_index--
+    set_checked(state.list, state.current_index)
+    console.log('statelist', state.list.value)
 }
 
 
@@ -109,7 +111,7 @@ const init = () => {
         let old_list = state.list
         console.log('old_list: ', old_list)
         let new_list = union_list(data, old_list)
-        set_checked(new_list); // 给数据添加checked参数
+        set_checked(new_list, 0); // 给数据添加checked参数
         state.list = new_list
         console.log('list: ', new_list);
     })

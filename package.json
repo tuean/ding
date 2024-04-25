@@ -12,6 +12,7 @@
   "dependencies": {
     "@tauri-apps/api": "^1.4.0",
     "md-editor-v3": "^2.2.1",
+    "mitt": "^3.0.1",
     "vue": "^3.2.37",
     "vue-router": "^4.1.3"
   },

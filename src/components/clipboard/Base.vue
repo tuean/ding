@@ -2,7 +2,7 @@
     <div class="main">
         <!-- <div>剪贴板</div> -->
         <div class="content-box" ref="container">
-            <Box v-for="(info, index) in state.list" :key="info.id" :info="info" :index="index" />
+            <Box @click="choose" v-for="(info, index) in state.list" :key="info.id" :info="info" :index="index" />
         </div>
 
     </div>
@@ -103,7 +103,7 @@ onMounted(() => {
 const init = () => {
     // 剪贴板事件监听
     const webview = new WebviewWindow('clipboard');
-    debugger
+    // debugger
     listen("CLIPBOARD_UPDATE", async (event) => {
         console.log('clipboard update: ', event)
         let data = await clips(state.last_id)
@@ -118,6 +118,11 @@ const init = () => {
 }
 
 init();
+
+
+const choose = () => {
+
+}
 
 
 </script>

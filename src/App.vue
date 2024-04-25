@@ -12,7 +12,7 @@
 <script setup>
 import Editor from "./components/Editor.vue";
 import { registerShortcut } from "./util/shortcut";
-import { reactive } from "vue";
+import { reactive, onMounted } from "vue";
 import { isRegistered, register, unregister } from "@tauri-apps/api/globalShortcut";
 import { useRouter } from "vue-router";
 import { appWindow, primaryMonitor, WebviewWindow } from "@tauri-apps/api/window";
@@ -70,6 +70,16 @@ appWindow.listen("LogicalPosition", ({ event, payload }) => {
   appWindow.close();
  }
 
+
+onMounted(() => {
+  let local_path = window.location.hash
+  console.log('local path', local_path)
+  if (local_path === '#/clipboard') {
+    state.dragable = false
+  } else {
+    state.dragable = true
+  }
+})
 </script>
 
 <style scoped>
@@ -84,7 +94,8 @@ appWindow.listen("LogicalPosition", ({ event, payload }) => {
   flex-direction: row-reverse;
 }
 .content {
-  margin-top: 24px;
+  /* margin-top: 24px; */
+  padding-top: 1px;
 }
 
 .minus {

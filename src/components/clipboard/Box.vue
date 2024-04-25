@@ -69,7 +69,9 @@ console.log("info:", info)
 }
 
 .checked {
-    outline: 1px solid red;
+    outline: 4px solid purple;
+    outline-offset: 2px;
+    /* -moz-outline-radius: 8px; */
 }
 
 .invisible {
@@ -104,6 +106,7 @@ console.log("info:", info)
 
 .footer {
     height: 30px;
+    color: gray;
 }
 
 

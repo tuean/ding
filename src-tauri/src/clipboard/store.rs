@@ -105,11 +105,12 @@ pub fn add_record(content:&String, clip_type:ClipType) -> Result<(), Error> {
 
 pub fn get_record(last_id: i16) -> Result<Vec<Clip>, Error> {
     let conn: Connection = get_connection();
-    let sql_with_param = "select id, content_type, content, date from tb_clipboard where id > ? order by id desc limit 10";
+    let size:i8 = 20;
+    let sql_with_param = "select id, content_type, content, date from tb_clipboard where id > ? order by id desc limit ?";
     let mut stmt = conn.prepare(sql_with_param)?;
     
     println!("sql_with_param: {} id: {}", sql_with_param, last_id);
-    let clips = stmt.query_map(params![&last_id], |row| {
+    let clips = stmt.query_map(params![&last_id, &size], |row| {
         Ok(Clip {
              id: row.get(0)?, 
              content_type: ClipType::parse_name(row.get(1)?), 

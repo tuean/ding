@@ -2,7 +2,10 @@
 use std::thread;
 
 use arboard::Clipboard;
-use tauri::{App, AppHandle, GlobalShortcutManager, LogicalPosition, LogicalSize, Manager, Position, Size};
+use tauri::{
+    App, AppHandle, GlobalShortcutManager, LogicalPosition, LogicalSize, 
+    Manager, Position, Size, Window, WindowBuilder
+};
 
 use crate::clipboard;
 
@@ -16,7 +19,19 @@ pub const NEW_CLIP: &'static str = "CLIPBOARD_UPDATE";
 fn set_window_main(app: &mut App) -> SetupResult {
     let win = app.get_window("main").unwrap();
     // let win = app.get_window("clipboard").unwrap();
-    let _ = win.center();
+    let monitors = win.available_monitors()?;
+    let monitor = monitors.get(1).ok_or(tauri::Error::CreateWindow)?;
+
+    let pos = monitor.position();
+
+    win.set_position(Position::Physical(
+        tauri::PhysicalPosition{
+            x: pos.x,
+            y: 0
+        })
+    )?; 
+    // app.get_window("clipboard").unwrap();
+    // let _ = win.center();
     let _ = win.hide();
     Ok(())
 }
@@ -95,6 +110,23 @@ pub fn broadcast_new_clipboard_event(app_handle: &AppHandle) -> Result<(), Setup
     println!("broadcast a new event");
     Ok(())
 }
+
+fn move_window_to_other_monitor(window: &Window, i: usize) -> tauri::Result<()> {
+    let monitors = window.available_monitors()?;
+    let monitor = monitors.get(i).ok_or(tauri::Error::CreateWindow)?;
+  
+    let pos = monitor.position();
+  
+    window.set_position(Position::Physical(
+        tauri::PhysicalPosition{
+            x: pos.x,
+            y: 0
+        })
+    )?;
+  
+    window.center()?;
+    Ok(())
+  }
 
 pub fn init(app: &mut App) -> SetupResult {
     set_window_main(app)?;

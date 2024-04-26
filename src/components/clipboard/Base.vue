@@ -2,9 +2,11 @@
     <div class="main">
         <!-- <div>剪贴板</div> -->
         <div class="content-box" ref="container">
-            <Box @click="choose" v-for="(info, index) in state.list" :key="info.id" :info="info" :index="index" />
+            <Box :id="info.id"
+                @click="choose" 
+                v-for="(info, index) in state.list" :key="info.id" :info="info" :index="index" />
         </div>
-
+        <!-- :ref="(el) => refsCollection.set(info.id, el)"  -->
     </div>
 </template>
 
@@ -28,26 +30,31 @@ const clips = async (last_id) => {
     return data;
 }
 
-// const move = (index) => {
-//     state.current_index = index;
-//     state.list.forEach(function (i) {
-//         i.checked = i == index;
-//     })
-// }
+const scrollTo = () => {
+    let el = document.getElementById(state.list[state.current_index].id);
+    console.log("el", el)
+    el.scrollIntoView({
+        block: "start", 
+        behavior: "smooth",
+        inline: "center"
+    });
+}
 
 const next = () => {
     let max = state.list.length
-    if (state.current_index > max - 1) return;
+    if (state.current_index >= max - 1) return;
     state.current_index++
     set_checked(state.list, state.current_index)
-    console.log('statelist:', state.list.value)
+    // console.log('statelist:', state.list.value)
+    scrollTo()
 }
 
 const last = () => {
     if (state.current_index == 0) return;
     state.current_index--
     set_checked(state.list, state.current_index)
-    console.log('statelist', state.list.value)
+    // console.log('statelist', state.list.value)
+    scrollTo()
 }
 
 
@@ -114,6 +121,7 @@ const init = () => {
         set_checked(new_list, 0); // 给数据添加checked参数
         state.list = new_list
         console.log('list: ', new_list);
+        state.current_index = 0;
     })
 }
 

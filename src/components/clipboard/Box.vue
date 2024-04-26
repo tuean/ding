@@ -3,8 +3,11 @@
         'box checked': info.checked,
         'box': !info.checked
     }">
-        <input class="invisible" v-bind:autofocus="info.checked"/>
-        <div class="header">{{ typeValue(info.content_type) }}</div>
+        <input class="invisible" />
+        <div class="header">
+            <div class="left">{{ typeValue(info.content_type) }}</div>
+            <div class="right">{{ size_length(info) }}个字符</div>
+        </div>
         <div class="content">
             <div class="word">{{ info.content }}</div>
         </div>
@@ -12,7 +15,7 @@
     </div>
 </template>
 <!-- v-bind:checked="info.checked" -->
-
+<!-- v-myfocus="info.checked" -->
 <script setup>
 import { defineProps, reactive, onMounted, onBeforeUnmount } from 'vue';
 import { formatRelativeTime } from '../../util/util'
@@ -36,6 +39,11 @@ const state = reactive({
 const typeValue = content_type => {
     if ("Text" === content_type) return "文本"
     return "其他类型"
+}
+
+const size_length = info => {
+    if ("Text" != info.content_type) return ""
+    return info.content.length
 }
 
 onMounted(() => {
@@ -100,13 +108,23 @@ console.log("info:", info)
     text-align: left;
     font-size: 16px;
     color: gray;
-    padding-left: 8px;
+    /* padding-left: 8px; */
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
 
 .footer {
     height: 30px;
     color: gray;
+}
+
+.left {
+    padding-left: 2px;
+}
+.right {
+    padding-right: 2px;
 }
 
 

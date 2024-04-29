@@ -2,9 +2,10 @@
     <div class="main">
         <!-- <div>剪贴板</div> -->
         <div class="content-box" ref="container">
-            <Box :id="info.id"
-                @click="choose" 
-                v-for="(info, index) in state.list" :key="info.id" :info="info" :index="index" />
+            <Box :id="info.id" 
+            @dblclick="copy(info, index)"
+            @click="choose(info, index)" v-for="(info, index) in state.list" :key="info.id"
+                :info="info" :index="index" />
         </div>
         <!-- :ref="(el) => refsCollection.set(info.id, el)"  -->
     </div>
@@ -24,40 +25,6 @@ const state = reactive({
     list: []
 })
 
-const clips = async (last_id) => {
-    let data = invoke("get_clipboard", { lastId: last_id });
-    console.debug('receive data: ', data)
-    return data;
-}
-
-const scrollTo = () => {
-    let el = document.getElementById(state.list[state.current_index].id);
-    console.log("el", el)
-    el.scrollIntoView({
-        block: "start", 
-        behavior: "smooth",
-        inline: "center"
-    });
-}
-
-const next = () => {
-    let max = state.list.length
-    if (state.current_index >= max - 1) return;
-    state.current_index++
-    set_checked(state.list, state.current_index)
-    // console.log('statelist:', state.list.value)
-    scrollTo()
-}
-
-const last = () => {
-    if (state.current_index == 0) return;
-    state.current_index--
-    set_checked(state.list, state.current_index)
-    // console.log('statelist', state.list.value)
-    scrollTo()
-}
-
-
 // 滚轮事件监听
 const container = ref(null);
 const handleWheel = (event) => {
@@ -73,6 +40,62 @@ const handleWheel = (event) => {
     // 设置滚动距离  
     container.value.scrollLeft = scrollLeft;
 };
+
+const clips = async (last_id) => {
+    let data = invoke("get_clipboard", { lastId: last_id });
+    return data;
+}
+
+const clips_older = async (id) => {
+    let data = invoke("get_older", { lastId: id });
+    return data;
+}
+
+const scrollTo = () => {
+    let el = document.getElementById(state.list[state.current_index].id);
+    console.log("el", el)
+    el.scrollIntoView({
+        block: "start",
+        behavior: "smooth",
+        inline: "center"
+    });
+}
+
+const history_check = () => {
+    let max = state.list.length
+    if (state.current_index > max - 5) {
+        let id = state.list[state.current_index].id
+        load_old_data(id)
+    }
+}
+
+const next = () => {
+    let max = state.list.length
+    history_check();
+    if (state.current_index >= max - 1) return;
+    state.current_index++
+    set_checked(state.list, state.current_index)
+    scrollTo()
+}
+
+const last = () => {
+    if (state.current_index == 0) return;
+    state.current_index--
+    set_checked(state.list, state.current_index)
+    scrollTo()
+}
+
+const choose = (info, index) => {
+    state.current_index = index
+    history_check()
+    set_checked(state.list, state.current_index)
+    scrollTo()
+}
+
+const copy = (info, index) => {
+    choose(info, index)
+
+}
 
 onMounted(() => {
     // 添加滚动事件监听器  
@@ -107,30 +130,46 @@ onMounted(() => {
     });
 });
 
+
+
+const load_newest_data = async (reset_index) => {
+    let data = await clips(state.last_id)
+    console.log('data: ', data)
+    let old_list = state.list
+    console.log('old_list: ', old_list)
+    let new_list = union_list(data, old_list)
+    if (reset_index) {
+        set_checked(new_list, 0); // 给数据添加checked参数
+        state.current_index = 0;
+    }
+    state.list = new_list
+    console.log('list: ', new_list);
+}
+
+const load_old_data = async (id) => {
+    let data = await clips_older(id)
+    let old_list = state.list
+    console.log('old_list: ', old_list)
+    let new_list = union_list(data, old_list)
+    if (reset_index) {
+        set_checked(new_list, 0); // 给数据添加checked参数
+        state.current_index = 0;
+    }
+    state.list = new_list
+    console.log('list: ', new_list);
+}
+
 const init = () => {
     // 剪贴板事件监听
     const webview = new WebviewWindow('clipboard');
     // debugger
     listen("CLIPBOARD_UPDATE", async (event) => {
         console.log('clipboard update: ', event)
-        let data = await clips(state.last_id)
-        console.log('data: ', data)
-        let old_list = state.list
-        console.log('old_list: ', old_list)
-        let new_list = union_list(data, old_list)
-        set_checked(new_list, 0); // 给数据添加checked参数
-        state.list = new_list
-        console.log('list: ', new_list);
-        state.current_index = 0;
+        load_newest_data(true)
     })
 }
 
 init();
-
-
-const choose = () => {
-
-}
 
 
 </script>

@@ -1,7 +1,16 @@
 use rusqlite::{Connection, Result, Error, params};
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::{error::Error, result, time::{SystemTime, UNIX_EPOCH}};
 use serde::Serialize;
 use tauri::api::path::data_dir;
+
+#[derive(Error, Debug)]
+pub enum DBError {
+    #[error("Database connection error")]
+    ConnectionError(#[from] rusqlite::Error),
+    #[error("Clip not found for the given ID")]
+    ClipNotFoundError,
+    // 可能还有其他错误类型...
+}
 
 #[derive(Debug, Serialize)]
 pub enum ClipType {
@@ -123,6 +132,51 @@ pub fn get_record(last_id: i16) -> Result<Vec<Clip>, Error> {
         result.push(c?);
     }
     Ok(result)
+}
+
+pub fn get_record_old(last_id: i16) -> Result<Vec<Clip>, Error> {
+    let conn: Connection = get_connection();
+    let size:i8 = 20;
+
+    let sql_with_param = "select id, content_type, content, date from tb_clipboard where id < ? order by id desc limit ?";
+    let mut stmt = conn.prepare(sql_with_param)?;
+
+    println!("sql_with_param: {} id: {}", sql_with_param, last_id);
+    let clips = stmt.query_map(params![&last_id, &size], |row| {
+        Ok(Clip {
+             id: row.get(0)?, 
+             content_type: ClipType::parse_name(row.get(1)?), 
+             content: row.get(2)?, 
+             date: row.get(3)? 
+            })
+    })?;
+    let mut result = Vec::new();
+    for c in clips {
+        result.push(c?);
+    }
+    Ok(result)
+}
+
+pub fn get_clip_by_id(id: i16) -> Result<Clip, Error> {
+    let conn: Connection = get_connection();
+    let sql_with_param = "select id, content_type, content, date from tb_clipboard where id = ?";
+    let mut stmt = conn.prepare(sql_with_param)?;
+
+    let mut clips = stmt.query_map(params![&id], |row| {
+        Ok(Clip {
+             id: row.get(0)?, 
+             content_type: ClipType::parse_name(row.get(1)?), 
+             content: row.get(2)?, 
+             date: row.get(3)? 
+            })
+    })?;
+
+    if let Some(result) = clips.next() {
+        let result = result?;
+        return Ok(result)
+    } else {
+        return Err(ClipNotFoundError)
+    }
 }
 
 // #[derive(Debug)]

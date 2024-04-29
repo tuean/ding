@@ -19,8 +19,11 @@ pub const NEW_CLIP: &'static str = "CLIPBOARD_UPDATE";
 fn set_window_main(app: &mut App) -> SetupResult {
     let win = app.get_window("main").unwrap();
     // let win = app.get_window("clipboard").unwrap();
-    let monitors = win.available_monitors()?;
-    let monitor = monitors.get(1).ok_or(tauri::Error::CreateWindow)?;
+    // let monitors = win.available_monitors()?;
+    // let monitor = monitors.get(1).ok_or(tauri::Error::CreateWindow)?;
+    let monitor = win.current_monitor()
+    .expect("failed to get monitor info")
+    .expect("failed to get monitor info");
 
     let pos = monitor.position();
 

@@ -29,7 +29,13 @@ fn main() {
     .menu(menu)
     .system_tray(tray)
     .on_system_tray_event(menu::generate_tray)
-    .invoke_handler(tauri::generate_handler![command::sync_html, command::sync_md, command::get_clipboard])
+    .invoke_handler(tauri::generate_handler![
+      command::sync_html, 
+      command::sync_md, 
+      command::get_clipboard,
+      command::get_older,
+      command::do_copy
+      ])
     .plugin(tauri_plugin_window_state::Builder::default().build())
     .setup(setup::init)
     // .manage(state)

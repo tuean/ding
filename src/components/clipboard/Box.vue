@@ -9,7 +9,9 @@
             <div class="right">{{ size_length(info) }}个字符</div>
         </div>
         <div class="content">
-            <div class="word">{{ info.content }}</div>
+            <div v-if="info.content_type === 'Text'" class="word">{{ info.content }}</div>
+            <div v-if="info.content_type === 'Unknown'" class="word"><div v-html="info.content"></div></div>
+            <div v-if="info.content_type === 'Html'" class="word"> <div v-html="info.content"></div></div>
         </div>
         <div class="footer">{{ state.dateShow }}</div>
     </div>

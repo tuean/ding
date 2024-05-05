@@ -22,6 +22,8 @@ pub enum ClipType {
     Text,
     Image,
     File,
+    Html,
+    Rtf,
     Unknown
 }
 

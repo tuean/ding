@@ -4,7 +4,8 @@
 // todo: file type not support yet
 
 pub(crate) mod store;
-mod listen;
+pub(crate) mod listen; 
+// mod listen;
 use clipboard_master::{Master, ClipboardHandler, CallbackResult};
 use arboard::Clipboard;
 use tauri::{App, AppHandle};

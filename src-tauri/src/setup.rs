@@ -1,13 +1,15 @@
 
-use std::thread;
+use std::{thread, time::Duration};
 
 use arboard::Clipboard;
+use clipboard_rs::{ClipboardWatcher, ClipboardWatcherContext};
 use tauri::{
     App, AppHandle, GlobalShortcutManager, LogicalPosition, LogicalSize, 
     Manager, Position, Size, Window, WindowBuilder
 };
 
 use crate::clipboard;
+use crate::clipboard::listen::{Manager as ClipboardManager};
 
 pub type AppError = Box<(dyn std::error::Error + 'static)>;
 pub type SetupResult = Result<(), AppError>;
@@ -97,9 +99,22 @@ fn register_shortcut(app: &mut App) -> SetupResult {
 
 pub fn init_app_handle(app:&mut App) -> Result<(), SetupResult> {
   let apphandle = app.app_handle();
-  thread::spawn(|| {
-    clipboard::clipboard_listen(apphandle);
-  });  
+//   thread::spawn(|| {
+    // clipboard::clipboard_listen(apphandle);
+    // monitor
+//   });  
+    thread::spawn(move || {
+        let manager = ClipboardManager::new(apphandle);
+
+        let mut watcher = ClipboardWatcherContext::new().unwrap();
+
+        let watcher_shutdown: clipboard_rs::WatcherShutdown = watcher.add_handler(manager).get_shutdown_channel();
+        println!("start watch!");
+        watcher.start_watch()
+    });
+
+
+    println!("init app handle finish");
   Ok(())
 }
 

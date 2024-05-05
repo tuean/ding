@@ -62,18 +62,14 @@ console.log("info:", info)
 
 <style scoped>
 .box {
-    /* height: 100%; */
+    user-select: none;
     margin: 14px;
-    /* display: flex; */
-    /* line-height: 30px; */
     align-items: center;
-    /* justify-content: space-between; */
-    /* flex-direction: column; */
     cursor: pointer;
     display: flex;
-    flex-direction: column; /* 设置主轴为垂直方向 */
+    flex-direction: column; 
     /* height: 100vh; 为了演示效果，假设容器高度为视口高度 */
-    justify-content: space-between; /* 头尾部分沿主轴均匀分布 */
+    justify-content: space-between; 
 }
 
 .checked {

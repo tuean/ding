@@ -92,9 +92,9 @@ const choose = (info, index) => {
     scrollTo()
 }
 
-const copy = (info, index) => {
+const copy = async (info, index) => {
     choose(info, index)
-
+    invoke("do_copy", { id: info.id });
 }
 
 onMounted(() => {

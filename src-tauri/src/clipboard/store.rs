@@ -1,16 +1,21 @@
 use rusqlite::{Connection, Result, Error, params};
-use std::{error::Error, result, time::{SystemTime, UNIX_EPOCH}};
+use core::fmt;
+use std::{result, time::{SystemTime, UNIX_EPOCH}};
 use serde::Serialize;
 use tauri::api::path::data_dir;
 
-#[derive(Error, Debug)]
-pub enum DBError {
-    #[error("Database connection error")]
-    ConnectionError(#[from] rusqlite::Error),
-    #[error("Clip not found for the given ID")]
-    ClipNotFoundError,
-    // 可能还有其他错误类型...
-}
+// #[derive(Debug)]
+// struct DBError {
+//     message: String
+// }
+
+// impl fmt::Display for DBError {
+//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+//         write!(f, "{}", self.message)
+//     }
+// }
+
+// impl std::error::Error for DBError {}
 
 #[derive(Debug, Serialize)]
 pub enum ClipType {
@@ -44,10 +49,10 @@ impl ClipType {
 #[derive(Debug, Serialize)]
 #[warn(dead_code)]
 pub struct Clip {
-    id: i32,
-    content_type: ClipType,
-    content: String,
-    date: i32
+    pub id: i32,
+    pub content_type: ClipType,
+    pub content: String,
+    pub date: i32
 }
 
 fn get_connection() -> Connection {
@@ -134,7 +139,7 @@ pub fn get_record(last_id: i16) -> Result<Vec<Clip>, Error> {
     Ok(result)
 }
 
-pub fn get_record_old(last_id: i16) -> Result<Vec<Clip>, Error> {
+pub fn get_record_old(last_id: i16) -> Result<Vec<Clip>> {
     let conn: Connection = get_connection();
     let size:i8 = 20;
 
@@ -157,7 +162,7 @@ pub fn get_record_old(last_id: i16) -> Result<Vec<Clip>, Error> {
     Ok(result)
 }
 
-pub fn get_clip_by_id(id: i16) -> Result<Clip, Error> {
+pub fn get_clip_by_id(id: i16) -> Result<Clip, rusqlite::Error> {
     let conn: Connection = get_connection();
     let sql_with_param = "select id, content_type, content, date from tb_clipboard where id = ?";
     let mut stmt = conn.prepare(sql_with_param)?;
@@ -173,10 +178,15 @@ pub fn get_clip_by_id(id: i16) -> Result<Clip, Error> {
 
     if let Some(result) = clips.next() {
         let result = result?;
-        return Ok(result)
+        return Ok(result);
     } else {
-        return Err(ClipNotFoundError)
+        let custom_error = Error::SqliteFailure(rusqlite::ffi::Error {
+            code: rusqlite::ffi::ErrorCode::Unknown, // 或选择其他合适的错误代码
+            extended_code: 0, // 扩展错误码，根据需要设定
+        }, Some(String::from("clip not found")));
+        return Err(custom_error)
     }
+    
 }
 
 // #[derive(Debug)]

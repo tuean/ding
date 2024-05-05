@@ -4,18 +4,19 @@
 // todo: file type not support yet
 
 pub(crate) mod store;
+mod listen;
 use clipboard_master::{Master, ClipboardHandler, CallbackResult};
 use arboard::Clipboard;
 use tauri::{App, AppHandle};
 use std::io;
 
-// use crate::{clipboard::store::{init_table, add_record}, setup::broadcast_new_clipboard_event};
 use crate::{clipboard::store::{add_record, init_table}, setup::broadcast_new_clipboard_event};
+
+use self::store::Clip;
 
 struct Handler {
     pub apphandle: AppHandle
 }
-
 
 impl ClipboardHandler for Handler {
     fn on_clipboard_change(&mut self) -> CallbackResult {
@@ -32,7 +33,7 @@ impl ClipboardHandler for Handler {
 }
 
 fn listen() {
-    let mut clipboard = Clipboard::new().unwrap();
+    let mut clipboard: Clipboard = Clipboard::new().unwrap();
     match clipboard.get_text() {
         Ok(text) => {
             println!("Clipboard text was: {}", text);
@@ -46,4 +47,22 @@ pub fn clipboard_listen(app: AppHandle) {
     let _ = init_table();
     println!("start to listen clipboard");
     let _ = Master::new(Handler{apphandle: app}).run();
+}
+
+
+pub fn clipboard_set(clip:Clip) {
+    // match clip.content_type {
+    //     store::ClipType::Text => {
+            
+    //     },
+    //     store::ClipType::File => {
+
+    //     }, 
+    //     store::ClipType::Image => {
+
+    //     }, 
+    //     store::ClipType::Unknown => {
+            
+    //     }
+    // }
 }

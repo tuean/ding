@@ -12,6 +12,12 @@
             <div v-if="info.content_type === 'Text'" class="word">{{ info.content }}</div>
             <div v-if="info.content_type === 'Unknown'" class="word"><div v-html="info.content"></div></div>
             <div v-if="info.content_type === 'Html'" class="word"> <div v-html="info.content"></div></div>
+            <div v-if="info.content_type === 'Rtf'" class="word">{{ info.content }}</div>
+            <div v-if="info.content_type === 'File'" class="word">
+                <div v-for="item in info.content.split(';')">
+                    {{ item }}
+                </div>
+            </div>
         </div>
         <div class="footer">{{ state.dateShow }}</div>
     </div>
@@ -40,6 +46,10 @@ const state = reactive({
 
 const typeValue = content_type => {
     if ("Text" === content_type) return "文本"
+    if ("Html" === content_type) return "网页"
+    if ("File" === content_type) return "文件"
+    if ("Image" === content_type) return "图片"
+    if ("Rtf" === content_type) return "富文本"
     return "其他类型"
 }
 

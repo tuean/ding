@@ -2,6 +2,7 @@ use std::error::Error;
 
 // use clipboard_master::CallbackResult;
 
+use clipboard_rs::common::{RustImage, RustImageBuffer};
 use clipboard_rs::{
 	Clipboard, ClipboardContext, ClipboardHandler, ClipboardWatcher, ClipboardWatcherContext, ContentFormat,
 };
@@ -76,20 +77,31 @@ impl ClipboardHandler for Manager {
         let has_file = self.clipboard_context.has(ContentFormat::Files);
         if has_file && !broadcast{
             broadcast = true;
-            println!("has_file={}", has_rtf);
-            let file = self.clipboard_context.get_text().unwrap_or("".to_string());
-            // let _ = add_record(&file, crate::clipboard::store::ClipType::File);
-            println!("file={}", file);
+            println!("has_file={}", has_file);
+            let file = self.clipboard_context.get_files().unwrap_or(Vec::new());
+            let single_file_path_string = file.iter().map(|s| s.as_str()).collect::<Vec<&str>>().join(";");
+            let _ = add_record(&single_file_path_string, crate::clipboard::store::ClipType::File);
+            println!("file={:?}", file);
         }
 
 
         let has_image = self.clipboard_context.has(ContentFormat::Image);
         if has_image && !broadcast{
             broadcast = true;
-            println!("has_image={}", has_rtf);
-            let iamge = self.clipboard_context.get_text().unwrap_or("".to_string());
+            println!("has_image={}", has_image);
+            let rust_image_data = self.clipboard_context.get_image();
+            match rust_image_data {
+                Ok(img) => {
+                    let bmp = img.to_bitmap().unwrap();
+                    let bytes = bmp.get_bytes();
+
+                }, 
+                Err(err) => {
+                    println!("err={}", err)
+                }
+            }
             // let _ = add_record(&file, crate::clipboard::store::ClipType::File);
-            println!("file={}", iamge);
+            // println!("file={:?}", rust_image_data);
         }
 
         let has_text = self.clipboard_context.has(ContentFormat::Text);

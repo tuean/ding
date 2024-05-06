@@ -15,8 +15,11 @@
             <div v-if="info.content_type === 'Rtf'" class="word">{{ info.content }}</div>
             <div v-if="info.content_type === 'File'" class="word">
                 <div v-for="item in info.content.split(';')">
-                    {{ item }}
+                    {{ item.split('\\').pop() }}
                 </div>
+            </div>
+            <div v-if="info.content_type === 'Image'" class="word">
+                <img :src="state.image_data" class="img" />
             </div>
         </div>
         <div class="footer">{{ state.dateShow }}</div>
@@ -27,6 +30,8 @@
 <script setup>
 import { defineProps, reactive, onMounted, onBeforeUnmount } from 'vue';
 import { formatRelativeTime } from '../../util/util'
+import { readBinaryFile } from '@tauri-apps/api/fs';
+
 
 const { info } = defineProps({
     info: {
@@ -42,7 +47,16 @@ const { info } = defineProps({
 const state = reactive({
     dateShow: "",
     intervalId: null,
+    image_data: "",
 })
+
+const load_image = async () => {
+    let path = info.content
+    const binary_data = await readBinaryFile(path);
+    let binary_data_arr = new Uint8Array(binary_data);
+	let p = new Blob([binary_data], {type: 'image/png'});
+	state.image_data = URL.createObjectURL(p);
+}
 
 const typeValue = content_type => {
     if ("Text" === content_type) return "文本"
@@ -62,6 +76,9 @@ onMounted(() => {
     state.intervalId = setInterval(() => {
         state.dateShow = formatRelativeTime(info.date * 1000)
     }, 1000)
+    if (info.content_type === 'Image') {
+        load_image();
+    }
 })
 
 onBeforeUnmount(() => {
@@ -107,6 +124,12 @@ console.log("info:", info)
 .word {
     text-overflow: ellipsis;
     white-space: nowrap;
+    overflow: hidden;
+}
+
+.img {
+    height: auto;
+    width: auto;
     overflow: hidden;
 }
 

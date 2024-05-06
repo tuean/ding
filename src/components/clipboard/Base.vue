@@ -166,6 +166,7 @@ const init = () => {
     listen("CLIPBOARD_UPDATE", async (event) => {
         console.log('clipboard update: ', event)
         load_newest_data(true)
+        scrollTo()
     })
 }
 

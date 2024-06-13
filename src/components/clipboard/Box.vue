@@ -6,7 +6,7 @@
         <input class="invisible" />
         <div class="header">
             <div class="left">{{ typeValue(info.content_type) }}</div>
-            <div class="right">{{ size_length(info) }}个字符</div>
+            <div class="right"><span v-show="'Text' == info.content_type">{{ size_length(info) }}个字符</span></div>
         </div>
         <div class="content">
             <div v-if="info.content_type === 'Text'" class="word">{{ info.content }}</div>

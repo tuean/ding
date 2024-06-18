@@ -9,16 +9,17 @@
             <div class="right"><span v-show="'Text' == info.content_type">{{ size_length(info) }}个字符</span></div>
         </div>
         <div class="content">
-            <div v-if="info.content_type === 'Text'" class="word">{{ info.content }}</div>
-            <div v-if="info.content_type === 'Unknown'" class="word"><div v-html="info.content"></div></div>
-            <div v-if="info.content_type === 'Html'" class="word"> <div v-html="info.content"></div></div>
-            <div v-if="info.content_type === 'Rtf'" class="word">{{ info.content }}</div>
+            <!-- <div>content</div> -->
+            <div v-if="info.content_type === 'Text'" class="word"><div>{{ info.content }}</div></div>
+            <div v-if="info.content_type === 'Unknown'" class="html noclick"><div class="html-wrapper" v-html="info.content"></div></div>
+            <div v-if="info.content_type === 'Html'" class="html noclick"> <div v-html="info.content"></div></div>
+            <div v-if="info.content_type === 'Rtf'" class="word"><div>{{ info.content }}</div></div>
             <div v-if="info.content_type === 'File'" class="word">
                 <div v-for="item in info.content.split(';')">
-                    {{ item.split('\\').pop() }}
+                    <div>{{ item.split('\\').pop() }}</div>
                 </div>
             </div>
-            <div v-if="info.content_type === 'Image'" class="word">
+            <div v-if="info.content_type === 'Image'" class="image">
                 <img :src="state.image_data" class="img" />
             </div>
         </div>
@@ -112,9 +113,14 @@ console.log("info:", info)
     display: none;
 }
 
+.noclick {
+    pointer-events: none;
+}
+
 .content {
     padding: 6px;
-    width: 228px; /* 计算宽高比 */
+    min-width: 228px; /* 计算宽高比 */
+    max-width: 600px;
     flex-grow: 1; /* 让内容区域占据剩余空间 */
     display: flex;
     flex-direction: column;
@@ -127,9 +133,35 @@ console.log("info:", info)
     overflow: hidden;
 }
 
+.image {
+    overflow: hidden;
+    display: flex;
+    height: 50vh;
+    justify-content: space-around;
+}
+
 .img {
     height: auto;
     width: auto;
+    overflow: hidden;
+    object-fit: contain;
+}
+
+.html {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    justify-content: space-around;
+    word-wrap: break-word;
+    height: 50vh;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow: auto;
+}
+
+.html-wrapper {
+    max-width: 200px;
+    object-fit: cover;
     overflow: hidden;
 }
 

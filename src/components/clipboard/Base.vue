@@ -52,6 +52,7 @@ const clips_older = async (id) => {
 }
 
 const scrollTo = () => {
+    if (state.list.length < 1) return;
     let el = document.getElementById(state.list[state.current_index].id);
     console.log("el", el)
     el.scrollIntoView({
@@ -94,7 +95,10 @@ const choose = (info, index) => {
 
 const copy = async (info, index) => {
     choose(info, index)
-    invoke("do_copy", { id: info.id });
+    // invoke("do_copy", { id: info.id });
+    console.log("appWindow hide", appWindow)
+    appWindow.hide();
+    invoke('do_paste', { id: info.id });
 }
 
 onMounted(() => {
@@ -103,19 +107,28 @@ onMounted(() => {
 
     // 键盘事件处理  
     document.addEventListener('keydown', function (event) {
-        console.log('key event', event)
+        // console.log('key event', event)
         switch (event.key) {
             case 'ArrowUp':
+                console.log('ArrowUp')
                 last()
                 break;
             case 'ArrowDown':
+                console.log('ArrowDown')
                 next()
                 break;
             case 'ArrowLeft':
+                console.log('ArrowLeft')
                 last();
                 break;
             case 'ArrowRight':
+                console.log('ArrowRight')
                 next();
+                break;
+            case 'Enter':
+                console.log('enter')
+                if (state.list.length < 1 || state.current_index < 1) break;
+                copy(state.list[state.current_index], state.current_index);
                 break;
             default:
                 return;
@@ -151,10 +164,10 @@ const load_old_data = async (id) => {
     let old_list = state.list
     console.log('old_list: ', old_list)
     let new_list = union_list(data, old_list)
-    if (reset_index) {
-        set_checked(new_list, 0); // 给数据添加checked参数
-        state.current_index = 0;
-    }
+    // if (reset_index) {
+        // set_checked(new_list, 0); // 给数据添加checked参数
+        // state.current_index = 0;
+    // }
     state.list = new_list
     console.log('list: ', new_list);
 }

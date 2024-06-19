@@ -34,7 +34,8 @@ fn main() {
       command::sync_md, 
       command::get_clipboard,
       command::get_older,
-      command::do_copy
+      command::do_copy,
+      command::do_paste
       ])
     .plugin(tauri_plugin_window_state::Builder::default().build())
     .setup(setup::init)

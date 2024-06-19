@@ -10,6 +10,7 @@ use tauri::{
 
 use crate::clipboard;
 use crate::clipboard::listen::{Manager as ClipboardManager};
+use crate::clipboard::store::init_table;
 
 pub type AppError = Box<(dyn std::error::Error + 'static)>;
 pub type SetupResult = Result<(), AppError>;
@@ -99,6 +100,7 @@ fn register_shortcut(app: &mut App) -> SetupResult {
 
 pub fn init_app_handle(app:&mut App) -> Result<(), SetupResult> {
   let apphandle = app.app_handle();
+  init_table();
 //   thread::spawn(|| {
     // clipboard::clipboard_listen(apphandle);
     // monitor

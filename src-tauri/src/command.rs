@@ -60,9 +60,28 @@ pub fn get_older(last_id: i16) -> Vec<Clip> {
 pub fn do_copy(id: i16) {
     println!("do copy event {}", id);
     match get_clip_by_id(id) {
-        Ok(data) => clipboard_set(data),
+        Ok(data) => {
+            clipboard_set(data)
+
+        },
         Err(_) => {
             println!("get clio error: {}", id)
+        }
+    };
+}
+
+
+#[tauri::command]
+pub fn do_paste(id: i16) -> bool {
+    println!("do paste event");
+    match get_clip_by_id(id) {
+        Ok(data) => {
+            clipboard_set(data);
+            return true;
+        },
+        Err(_) => {
+            println!("get clio error: {}", id);
+            return false;
         }
     };
 }

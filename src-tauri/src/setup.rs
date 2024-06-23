@@ -1,13 +1,15 @@
 
-use std::{thread};
+use std::{thread, time::Duration};
 
+use arboard::Clipboard;
 use clipboard_rs::{ClipboardWatcher, ClipboardWatcherContext};
 use log::info;
 use tauri::{
     App, AppHandle, GlobalShortcutManager, LogicalPosition, LogicalSize, 
-    Manager, Position, Size
+    Manager, Position, Size, Window, WindowBuilder
 };
 
+use crate::clipboard;
 use crate::clipboard::listen::{Manager as ClipboardManager};
 use crate::clipboard::store::init_table;
 
@@ -31,7 +33,7 @@ fn set_window_main(app: &mut App) -> SetupResult {
             x: pos.x,
             y: 0
         })
-    )?; 
+    )?;
     let _ = win.hide();
     Ok(())
 }
@@ -73,13 +75,18 @@ fn register_shortcut(app: &mut App) -> SetupResult {
 
 
 pub fn init_app_handle(app:&mut App) -> Result<(), SetupResult> {
-    let _ = init_table(); 
-
-    let manager: ClipboardManager = ClipboardManager::new(app);
-
+  let apphandle = app.app_handle();
+  init_table();
+//   thread::spawn(|| {
+    // clipboard::clipboard_listen(apphandle);
+    // monitor
+//   });  
     thread::spawn(move || {
-        let mut watcher: ClipboardWatcherContext<ClipboardManager> = ClipboardWatcherContext::new().unwrap();
-        let _: clipboard_rs::WatcherShutdown = watcher.add_handler(manager).get_shutdown_channel();
+        let manager = ClipboardManager::new(apphandle);
+
+        let mut watcher = ClipboardWatcherContext::new().unwrap();
+
+        let watcher_shutdown: clipboard_rs::WatcherShutdown = watcher.add_handler(manager).get_shutdown_channel();
         info!("start watch!");
         watcher.start_watch()
     });
@@ -98,24 +105,7 @@ pub fn broadcast_new_clipboard_event(app_handle: &AppHandle) -> Result<(), Setup
     }
     info!("broadcast a new event");
     Ok(())
-}
-
-// fn move_window_to_other_monitor(window: &Window, i: usize) -> tauri::Result<()> {
-//     let monitors = window.available_monitors()?;
-//     let monitor = monitors.get(i).ok_or(tauri::Error::CreateWindow)?;
-  
-//     let pos = monitor.position();
-  
-//     window.set_position(Position::Physical(
-//         tauri::PhysicalPosition{
-//             x: pos.x,
-//             y: 0
-//         })
-//     )?;
-  
-//     window.center()?;
-//     Ok(())
-//   }
+  }
 
 pub fn init(app: &mut App) -> SetupResult {
     set_window_main(app)?;

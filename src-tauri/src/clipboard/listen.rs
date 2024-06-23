@@ -1,9 +1,14 @@
+use std::error::Error;
 use std::fs;
+use std::path::PathBuf;
+
+// use clipboard_master::CallbackResult;
 
 use chrono::Local;
-use clipboard_rs::common::RustImage;
+use clipboard_rs::common::{RustImage, RustImageBuffer};
 use clipboard_rs::{
-    Clipboard, ClipboardContext, ClipboardHandler, ContentFormat
+    Clipboard, ClipboardContext, ClipboardHandler, ClipboardWatcher, ClipboardWatcherContext,
+    ContentFormat,
 };
 
 use log::info;
@@ -13,11 +18,9 @@ use tauri::{AppHandle, App};
 use crate::clipboard::store::add_record;
 use crate::setup::broadcast_new_clipboard_event;
 
-
-// pub type Result<T> = std::result::Result<T, Box<dyn Error + Send + Sync + 'static>>;
+// use super::store::Clip;
 
 // all clipboard type see: https://learn.microsoft.com/zh-cn/windows/win32/dataxchg/standard-clipboard-formats?redirectedfrom=MSDN
-
 
 pub struct Manager {
     pub apphandle: AppHandle,
@@ -25,14 +28,13 @@ pub struct Manager {
 }
 
 impl Manager {
-    pub fn new(app: &App) -> Manager {
-        let state = Self {
-            apphandle: app.handle(),
+    pub fn new(app_handle: AppHandle) -> Manager {
+        Self {
+            apphandle: app_handle,
             clipboard_context: ClipboardContext::new().unwrap(),
-        };
-
-        state
+        }
     }
+
 }
 
 impl ClipboardHandler for Manager {

@@ -95,10 +95,10 @@ const choose = (info, index) => {
 
 const copy = async (info, index) => {
     choose(info, index)
-    // invoke("do_copy", { id: info.id });
     console.log("appWindow hide", appWindow)
-    appWindow.hide();
+    // appWindow.hide();
     invoke('do_paste', { id: info.id });
+    // debugger
 }
 
 onMounted(() => {
@@ -127,7 +127,7 @@ onMounted(() => {
                 break;
             case 'Enter':
                 console.log('enter')
-                if (state.list.length < 1 || state.current_index < 1) break;
+                if (state.list.length < 1) break;
                 copy(state.list[state.current_index], state.current_index);
                 break;
             default:

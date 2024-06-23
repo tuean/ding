@@ -3,6 +3,7 @@ use std::{thread, time::Duration};
 
 use arboard::Clipboard;
 use clipboard_rs::{ClipboardWatcher, ClipboardWatcherContext};
+use log::info;
 use tauri::{
     App, AppHandle, GlobalShortcutManager, LogicalPosition, LogicalSize, 
     Manager, Position, Size, Window, WindowBuilder
@@ -15,15 +16,12 @@ use crate::clipboard::store::init_table;
 pub type AppError = Box<(dyn std::error::Error + 'static)>;
 pub type SetupResult = Result<(), AppError>;
 
-// static mut LAST_ID:i16 = 0;
-pub const NEW_CLIP: &'static str = "CLIPBOARD_UPDATE";
+// pub const NEW_CLIP: &'static str = "CLIPBOARD_UPDATE";
 
 /// 设置窗口
 fn set_window_main(app: &mut App) -> SetupResult {
     let win = app.get_window("main").unwrap();
-    // let win = app.get_window("clipboard").unwrap();
-    // let monitors = win.available_monitors()?;
-    // let monitor = monitors.get(1).ok_or(tauri::Error::CreateWindow)?;
+
     let monitor = win.current_monitor()
     .expect("failed to get monitor info")
     .expect("failed to get monitor info");
@@ -35,9 +33,7 @@ fn set_window_main(app: &mut App) -> SetupResult {
             x: pos.x,
             y: 0
         })
-    )?; 
-    // app.get_window("clipboard").unwrap();
-    // let _ = win.center();
+    )?;
     let _ = win.hide();
     Ok(())
 }
@@ -56,13 +52,6 @@ fn set_window_clipboard(app: &mut App) -> SetupResult {
     // WindowUtil::set_window_top_level(&win);
     let _ = win.set_always_on_top(true);
     let _ = win.hide();
-    // 设置毛玻璃背景
-    // #[cfg(target_os = "macos")]
-    // window_vibrancy::apply_vibrancy(win, NSVisualEffectMaterial::Popover, None, None)
-    //     .expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
-    // 将窗口设置成类似 NSPanel 的模式 https://github.com/tauri-apps/tauri/issues/2258
-    // app.set_activation_policy(tauri::ActivationPolicy::Accessory);
-    // win.
     Ok(())
 }
 
@@ -72,20 +61,10 @@ fn register_shortcut(app: &mut App) -> SetupResult {
     let app_handler = app.handle();
     short_cut.register("ctrl+alt+v", move || {
         let window = app_handler.get_window("clipboard").unwrap();
-        println!("swtich action detected");
+        info!("swtich action detected");
         if window.is_visible().unwrap() {
-            // 使用 app.hide() 而不是 window.hide()，才能实现隐藏时焦点恢复到上一个应用
-            // app_handler.exit(0);
             let _ = window.hide();
         } else {
-            // app_handler.exit(0);
-            // let mut clipboard = Clipboard::new().unwrap();
-            // println!("Clipboard text was: {}", clipboard.get_text().unwrap());
-            // unsafe {
-            //     let clips = crate::clipboard::store::get_record(LAST_ID);
-            // }   
-            // let _ = app_handler.emit_all(NEW_CLIP, ());
-
             let _ = broadcast_new_clipboard_event(&app_handler);
             let _ = window.show();
             window.set_focus().unwrap();
@@ -94,9 +73,6 @@ fn register_shortcut(app: &mut App) -> SetupResult {
     Ok(())
 }
 
-// 设置广播事件
-
-// static mut APP: Option<&mut App> = None;  
 
 pub fn init_app_handle(app:&mut App) -> Result<(), SetupResult> {
   let apphandle = app.app_handle();
@@ -111,40 +87,23 @@ pub fn init_app_handle(app:&mut App) -> Result<(), SetupResult> {
         let mut watcher = ClipboardWatcherContext::new().unwrap();
 
         let watcher_shutdown: clipboard_rs::WatcherShutdown = watcher.add_handler(manager).get_shutdown_channel();
-        println!("start watch!");
+        info!("start watch!");
         watcher.start_watch()
     });
 
 
-    println!("init app handle finish");
-  Ok(())
+    info!("init app handle finish");
+    Ok(())
 }
 
 pub fn broadcast_new_clipboard_event(app_handle: &AppHandle) -> Result<(), SetupResult> {
     // let app_handle = app.app_handle();
     let r = app_handle.emit_all("CLIPBOARD_UPDATE", ());
     match r {
-        Ok(_) => println!("event send ok"),
-        Err(_) => println!("event send error"),
+        Ok(_) => info!("event send ok"),
+        Err(_) => info!("event send error"),
     }
-    println!("broadcast a new event");
-    Ok(())
-}
-
-fn move_window_to_other_monitor(window: &Window, i: usize) -> tauri::Result<()> {
-    let monitors = window.available_monitors()?;
-    let monitor = monitors.get(i).ok_or(tauri::Error::CreateWindow)?;
-  
-    let pos = monitor.position();
-  
-    window.set_position(Position::Physical(
-        tauri::PhysicalPosition{
-            x: pos.x,
-            y: 0
-        })
-    )?;
-  
-    window.center()?;
+    info!("broadcast a new event");
     Ok(())
   }
 

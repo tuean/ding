@@ -1,4 +1,5 @@
-use std::thread;
+use logger::init_logger;
+
 
 mod content;
 mod setup;
@@ -6,24 +7,14 @@ mod menu;
 mod command;
 mod clipboard;
 mod logger;
-
-// #![cfg_attr(
-//   all(not(debug_assertions), target_os = "windows"),
-//   windows_subsystem = "windows"
-// )]
-
-
-
+mod keyboard;
+mod util;
 
 fn main() {
-  logger::init();
+  let _ = init_logger();
 
   let (menu, tray) = menu::generate_menu();
   let context = tauri::generate_context!();
-
-  // thread::spawn(|| {
-  //   clipboard::clipboard_listen();
-  // });   
 
   tauri::Builder::default()
     .menu(menu)
@@ -34,7 +25,6 @@ fn main() {
       command::sync_md, 
       command::get_clipboard,
       command::get_older,
-      command::do_copy,
       command::do_paste
       ])
     .plugin(tauri_plugin_window_state::Builder::default().build())

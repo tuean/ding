@@ -1,21 +1,8 @@
+use log::{info, error};
 use rusqlite::{Connection, Result, Error, params};
-use core::fmt;
-use std::{result, time::{SystemTime, UNIX_EPOCH}};
+use std::{time::{SystemTime, UNIX_EPOCH}};
 use serde::Serialize;
-use tauri::api::path::data_dir;
-
-// #[derive(Debug)]
-// struct DBError {
-//     message: String
-// }
-
-// impl fmt::Display for DBError {
-//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-//         write!(f, "{}", self.message)
-//     }
-// }
-
-// impl std::error::Error for DBError {}
+use crate::util::get_db_file_path;
 
 #[derive(Debug, Serialize)]
 pub enum ClipType {
@@ -58,16 +45,14 @@ pub struct Clip {
 }
 
 fn get_connection() -> Connection {
-    let mut data_path: std::path::PathBuf = data_dir().unwrap();
-    data_path.push("clipboard");
-    let path = data_path.as_path().display().to_string();
-    // println!("database file path: {}", path);
+    let path = get_db_file_path();
+    info!("database file path: {}", path);
     let conn: Connection = Connection::open(path).unwrap();
     conn
 }
 
 pub fn init_table() -> Result<(), Error> {
-    println!("init table");
+    info!("init table start");
     let conn: Connection = get_connection();
     match conn.execute(
             "create table if not exists tb_clipboard (
@@ -77,8 +62,8 @@ pub fn init_table() -> Result<(), Error> {
                 date INTEGER
             )", ()
         ) {
-        Ok(_) => { println!("init table success")},
-        Err(e) => { println!("init table error: {}", e) },
+        Ok(_) => { info!("init table success")},
+        Err(e) => { error!("init table error: {}", e) },
     }
     Ok(())
 }
@@ -190,46 +175,3 @@ pub fn get_clip_by_id(id: i16) -> Result<Clip, rusqlite::Error> {
     }
     
 }
-
-// #[derive(Debug)]
-// struct Person {
-//     id: i32,
-//     name: String,
-//     data: Option<Vec<u8>>,
-// }
-
-// fn main() -> Result<()> {
-//     let conn = Connection::open_in_memory()?;
-
-//     conn.execute(
-//         "CREATE TABLE person (
-//             id    INTEGER PRIMARY KEY,
-//             name  TEXT NOT NULL,
-//             data  BLOB
-//         )",
-//         (), // empty list of parameters.
-//     )?;
-//     let me = Person {
-//         id: 0,
-//         name: "Steven".to_string(),
-//         data: None,
-//     };
-//     conn.execute(
-//         "INSERT INTO person (name, data) VALUES (?1, ?2)",
-//         (&me.name, &me.data),
-//     )?;
-
-//     let mut stmt = conn.prepare("SELECT id, name, data FROM person")?;
-//     let person_iter = stmt.query_map([], |row| {
-//         Ok(Person {
-//             id: row.get(0)?,
-//             name: row.get(1)?,
-//             data: row.get(2)?,
-//         })
-//     })?;
-
-//     for person in person_iter {
-//         println!("Found person {:?}", person.unwrap());
-//     }
-//     Ok(())
-// }

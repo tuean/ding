@@ -11,7 +11,7 @@ mod keyboard;
 mod util;
 
 fn main() {
-  init_logger();
+  let _ = init_logger();
 
   let (menu, tray) = menu::generate_menu();
   let context = tauri::generate_context!();

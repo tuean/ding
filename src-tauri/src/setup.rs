@@ -2,6 +2,7 @@
 use std::{thread};
 
 use clipboard_rs::{ClipboardWatcher, ClipboardWatcherContext};
+use log::info;
 use tauri::{
     App, AppHandle, GlobalShortcutManager, LogicalPosition, LogicalSize, 
     Manager, Position, Size
@@ -58,7 +59,7 @@ fn register_shortcut(app: &mut App) -> SetupResult {
     let app_handler = app.handle();
     short_cut.register("ctrl+alt+v", move || {
         let window = app_handler.get_window("clipboard").unwrap();
-        println!("swtich action detected");
+        info!("swtich action detected");
         if window.is_visible().unwrap() {
             let _ = window.hide();
         } else {
@@ -79,12 +80,12 @@ pub fn init_app_handle(app:&mut App) -> Result<(), SetupResult> {
     thread::spawn(move || {
         let mut watcher: ClipboardWatcherContext<ClipboardManager> = ClipboardWatcherContext::new().unwrap();
         let _: clipboard_rs::WatcherShutdown = watcher.add_handler(manager).get_shutdown_channel();
-        println!("start watch!");
+        info!("start watch!");
         watcher.start_watch()
     });
 
 
-    println!("init app handle finish");
+    info!("init app handle finish");
     Ok(())
 }
 
@@ -92,10 +93,10 @@ pub fn broadcast_new_clipboard_event(app_handle: &AppHandle) -> Result<(), Setup
     // let app_handle = app.app_handle();
     let r = app_handle.emit_all("CLIPBOARD_UPDATE", ());
     match r {
-        Ok(_) => println!("event send ok"),
-        Err(_) => println!("event send error"),
+        Ok(_) => info!("event send ok"),
+        Err(_) => info!("event send error"),
     }
-    println!("broadcast a new event");
+    info!("broadcast a new event");
     Ok(())
 }
 

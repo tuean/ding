@@ -84,20 +84,20 @@ pub fn add_record(content:&String, clip_type:ClipType) -> Result<(), Error> {
 
     match update_exist {
         Ok(size) => {
-            println!("update exist {:?} date: {:?}", size, now);
+            info!("update exist {:?} date: {:?}", size, now);
             if size == 0 {
                 match conn.execute(
                     "insert into tb_clipboard (content_type, content, date) values (
                         ?1, ?2, ?3
                     )", (c_type2, content, now)
                 ) {
-                    Ok(_) => { println!("add record success")},
-                    Err(e) => { println!("add record error: {}", e) },
+                    Ok(_) => { info!("add record success")},
+                    Err(e) => { info!("add record error: {}", e) },
                 }
             }
 
         },
-        Err(e) => { println!("update exist error: {}", e)}
+        Err(e) => { info!("update exist error: {}", e)}
     } 
     
     
@@ -110,7 +110,7 @@ pub fn get_record(last_id: i16) -> Result<Vec<Clip>, Error> {
     let sql_with_param = "select id, content_type, content, date from tb_clipboard where id > ? order by id desc limit ?";
     let mut stmt = conn.prepare(sql_with_param)?;
     
-    println!("sql_with_param: {} id: {}", sql_with_param, last_id);
+    info!("sql_with_param: {} id: {}", sql_with_param, last_id);
     let clips = stmt.query_map(params![&last_id, &size], |row| {
         Ok(Clip {
              id: row.get(0)?, 
@@ -133,7 +133,7 @@ pub fn get_record_old(last_id: i16) -> Result<Vec<Clip>> {
     let sql_with_param = "select id, content_type, content, date from tb_clipboard where id < ? order by id desc limit ?";
     let mut stmt = conn.prepare(sql_with_param)?;
 
-    println!("sql_with_param: {} id: {}", sql_with_param, last_id);
+    info!("sql_with_param: {} id: {}", sql_with_param, last_id);
     let clips = stmt.query_map(params![&last_id, &size], |row| {
         Ok(Clip {
              id: row.get(0)?, 

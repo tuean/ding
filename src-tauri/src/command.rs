@@ -1,5 +1,6 @@
 // use tauri::{App, AppHandle, Error, GlobalWindowEvent, Manager};
 
+use std::cmp::PartialEq;
 use crate::{
     clipboard::{
         store::{get_clip_by_id, get_record, get_record_old, Clip}
@@ -12,6 +13,10 @@ use clipboard_rs::{
 
 use std::thread;
 use std::time::Duration;
+use rtf_parser::document::RtfDocument;
+use rtf_parser::lexer::Lexer;
+use rtf_parser::parser::Parser;
+use crate::clipboard::store::ClipType::Rtf;
 
 #[tauri::command]
 pub fn sync_html(content: String) {
@@ -25,13 +30,23 @@ pub fn sync_md(content: String) {
     sync_source(content)
 }
 
+
+
 #[tauri::command]
 pub fn get_clipboard(last_id: i16) -> Vec<Clip> {
     println!("get newest data from js! {}", last_id);
     let clips = get_record(last_id);
     let empty: Vec<Clip> = Vec::new();
     match clips {
-        Ok(v) => return v,
+        Ok(v) => {
+            for i in &v {
+                if i.content_type == Rtf {
+                    let content = i.content.to_owned();
+                    let mut parser = Parser::new(Lexer::scan(&*content)?);
+                }
+            }
+            return v;
+        },
         Err(err) => {
             println!("select error:{}", err);
             return empty;

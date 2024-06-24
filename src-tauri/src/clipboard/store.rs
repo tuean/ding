@@ -20,6 +20,8 @@ impl ClipType {
             ClipType::Text => "text".to_owned(),
             ClipType::Image => "image".to_owned(),
             ClipType::File => "file".to_owned(),
+            ClipType::Html => "html".to_owned(),
+            ClipType::Rtf => "rtf".to_owned(),
             _ => "unknown".to_owned(),
         }
     }
@@ -29,6 +31,8 @@ impl ClipType {
             "text" => ClipType::Text,
             "image" => ClipType::Image,
             "file" => ClipType::File,
+            "html" => ClipType::Html,
+            "rtf" => ClipType::Rtf,
             _ => ClipType::Unknown
         };
         r
@@ -42,6 +46,12 @@ pub struct Clip {
     pub content_type: ClipType,
     pub content: String,
     pub date: i32
+}
+
+impl PartialEq for ClipType {
+    fn eq(&self, other: &Self) -> bool {
+        self.to_string() == other.to_string()
+    }
 }
 
 fn get_connection() -> Connection {

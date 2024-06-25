@@ -13,7 +13,7 @@
             <div v-if="info.content_type === 'Text'" class="word"><div>{{ info.content }}</div></div>
             <div v-if="info.content_type === 'Unknown'" class="html noclick"><div class="html-wrapper" v-html="info.content"></div></div>
             <div v-if="info.content_type === 'Html'" class="html noclick"> <div v-html="info.content"></div></div>
-            <div v-if="info.content_type === 'Rtf'" class="word"><div>{{ info.content }}</div></div>
+            <div v-if="info.content_type === 'Rtf'" class="word"><div v-html="info.rtf_result"></div></div>
             <div v-if="info.content_type === 'File'" class="word">
                 <div v-for="item in info.content.split(';')">
                     <div>{{ item.split('\\').pop() }}</div>
@@ -30,9 +30,9 @@
 <!-- v-myfocus="info.checked" -->
 <script setup>
 import { defineProps, reactive, onMounted, onBeforeUnmount } from 'vue';
-import { formatRelativeTime } from '../../util/util'
+import { formatRelativeTime, stringToArrayBuffer } from '../../util/util'
 import { readBinaryFile } from '@tauri-apps/api/fs';
-
+import {EMFJS, RTFJS, WMFJS} from 'rtf.js';
 
 const { info } = defineProps({
     info: {
@@ -55,8 +55,24 @@ const load_image = async () => {
     let path = info.content
     const binary_data = await readBinaryFile(path);
     let binary_data_arr = new Uint8Array(binary_data);
-	let p = new Blob([binary_data], {type: 'image/png'});
-	state.image_data = URL.createObjectURL(p);
+	  let p = new Blob([binary_data], {type: 'image/png'});
+	  state.image_data = URL.createObjectURL(p);
+}
+
+const transfer_rtf = async () => {
+    let content = info.content
+    RTFJS.loggingEnabled(false);
+    WMFJS.loggingEnabled(false);
+    EMFJS.loggingEnabled(false);
+    const doc = new RTFJS.Document(stringToArrayBuffer(content));
+    const meta = doc.metadata();
+    doc.render().then(function(htmlElements) {
+      console.log("Meta:");
+      console.log(meta);
+      console.log("Html:");
+      console.log(htmlElements);
+      info.rtf_result = Array.from(htmlElements).map(e => e.innerHTML).join("");
+    }).catch(error => console.error(error))
 }
 
 const typeValue = content_type => {
@@ -79,6 +95,9 @@ onMounted(() => {
     }, 1000)
     if (info.content_type === 'Image') {
         load_image();
+    }
+    if (info.content_type === 'Rtf') {
+        transfer_rtf();
     }
 })
 

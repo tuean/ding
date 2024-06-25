@@ -80,3 +80,13 @@ export const formatRelativeTime = (timestamp) => {
   // 差值小于1秒，返回“刚刚”
   return '刚刚';
 }
+
+
+export const stringToArrayBuffer = (string) => {
+    const buffer = new ArrayBuffer(string.length);
+    const bufferView = new Uint8Array(buffer);
+    for (let i = 0; i < string.length; i++) {
+        bufferView[i] = string.charCodeAt(i);
+    }
+    return buffer;
+}

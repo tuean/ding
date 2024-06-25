@@ -48,12 +48,6 @@ pub struct Clip {
     pub date: i32
 }
 
-impl PartialEq for ClipType {
-    fn eq(&self, other: &Self) -> bool {
-        self.to_string() == other.to_string()
-    }
-}
-
 fn get_connection() -> Connection {
     let path = get_db_file_path();
     info!("database file path: {}", path);

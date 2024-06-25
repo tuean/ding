@@ -7,12 +7,11 @@ use crate::{
     },
     content::{sync_content, sync_source}, keyboard::paste,
 };
-use clipboard_rs::{
-    Clipboard, ClipboardContext
-};
+use clipboard_rs::{Clipboard, ClipboardContext, RustImageData};
 
 use std::thread;
 use std::time::Duration;
+use clipboard_rs::common::RustImage;
 use crate::clipboard::store::ClipType::Rtf;
 
 #[tauri::command]
@@ -80,19 +79,62 @@ pub fn do_paste(id: i16, window: tauri::Window) -> bool {
                     } ;
                 },
                 crate::clipboard::store::ClipType::Image => {
-                    set_flag = true;
+                    let image_file_path = data.content;
+                    let image_data = RustImageData::from_path(image_file_path.as_str());
+                    if !image_data.is_ok() {
+                        return false;
+                    }
+                    match clipboard_context.set_image(image_data.unwrap()) {
+                        Ok(_) => {
+                            println!("set image done: {:?}", image_file_path.clone());
+                            set_flag = true;
+                        },
+                        Err(_) => {
+                            println!("set image err: {:?}", image_file_path.clone());
+                        }
+                    }
                 },
                 crate::clipboard::store::ClipType::File => {
-                    set_flag = true;
+                    let file_path = data.content;
+                    let v = file_path.clone();
+                    match clipboard_context.set_files(vec![file_path]) {
+                        Ok(_) => {
+                            println!("set image done: {:?}", v.clone());
+                            set_flag = true;
+                        },
+                        Err(_) => {
+                            println!("set image err: {:?}", v.clone());
+                        }
+                    }
                 },
                 crate::clipboard::store::ClipType::Html => {
-                    set_flag = true;
+                    let html = data.content;
+                    let v = html.clone();
+                    match clipboard_context.set_html(html) {
+                        Ok(_) => {
+                            println!("set image done: {:?}", v.clone());
+                            set_flag = true;
+                        },
+                        Err(_) => {
+                            println!("set image err: {:?}", v.clone());
+                        }
+                    }
                 },
                 crate::clipboard::store::ClipType::Rtf => {
-                    set_flag = true;
+                    let rtf = data.content;
+                    let v = rtf.clone();
+                    match clipboard_context.set_rich_text(rtf) {
+                        Ok(_) => {
+                            println!("set image done: {:?}", v.clone());
+                            set_flag = true;
+                        },
+                        Err(_) => {
+                            println!("set image err: {:?}", v.clone());
+                        }
+                    }
                 },
                 crate::clipboard::store::ClipType::Unknown => {
-                    set_flag = true;
+                    // todo
                 },
             }
         },
